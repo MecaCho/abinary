@@ -1,7 +1,6 @@
 #!/usr/bin/python
 #-*-coding=UTF-8
 #matching_game.py
-
 import sys, os
 import math, random
 import pygame
