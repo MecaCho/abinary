@@ -38,6 +38,14 @@ UP = 'up'
 DOWN = 'down'
 LEFT = 'left'
 RIGHT = 'right'
+pygame.init()
+BASICFONT = pygame.font.Font('gkai00mp.ttf', 18)
+
+FPSCLOCK = pygame.time.Clock()
+DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+pygame.display.set_caption('FuHsi')
+
+
 class slide_g(object):
     def __init__(self,BOARDHEIGHT=2,BOARDWIDTH=2):
         self.bw = BOARDWIDTH
@@ -48,16 +56,10 @@ class slide_g(object):
     def main(self):
         global FPSCLOCK, DISPLAYSURF, BASICFONT, RESET_SURF, RESET_RECT, NEW_SURF, NEW_RECT, SOLVE_SURF, SOLVE_RECT
 
-        pygame.init()
-        FPSCLOCK = pygame.time.Clock()
-        DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-        pygame.display.set_caption('FuHsi')
-        BASICFONT = pygame.font.Font('Arial.ttf', BASICFONTSIZE)
-
         # Store the option buttons and their rectangles in OPTIONS.
-        RESET_SURF, RESET_RECT = self.makeText('中文'.encode('gbk'),    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
-        NEW_SURF,   NEW_RECT   = self.makeText('neagame', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 60)
-        SOLVE_SURF, SOLVE_RECT = self.makeText('sloved',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 30)
+        RESET_SURF, RESET_RECT = self.makeText(u'中文',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
+        NEW_SURF,   NEW_RECT   = self.makeText(u'新游戏', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 60)
+        SOLVE_SURF, SOLVE_RECT = self.makeText(u'破解',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 30)
 
         mainBoard, solutionSeq = self.generateNewPuzzle(10)
         SOLVEDBOARD = self.getStartingBoard() # a solved board is the same as the board in a start state.
@@ -67,6 +69,7 @@ class slide_g(object):
             slideTo = None # the direction, if any, a tile should slide
             msg = u'点击数字或按下键盘的上下左右键滑动数字' # contains the message to show in the upper left corner.
             if mainBoard == SOLVEDBOARD:
+                return True
                 msg =u'成功!'
 
             self.drawBoard(mainBoard, msg)
@@ -308,7 +311,7 @@ class slide_g(object):
         lastMove = None
         for i in range(numSlides):
             move = self.getRandomMove(board, lastMove)
-            self.slideAnimation(board, move, 'y游戏初始化......', animationSpeed=int(TILESIZE / 3))
+            self.slideAnimation(board, move, u'游戏初始化......', animationSpeed=int(TILESIZE / 3))
             self.makeMove(board, move)
             sequence.append(move)
             lastMove = move
@@ -366,17 +369,14 @@ bg_Group.add(background('know.png',bg_location[1]))
 bg_Group.add(background('newgame.png',bg_location[2]))
 bg_Group.add(background('exit.png',bg_location[3]))
 
-
-screenCaption = pygame.display.set_caption('Fuhsi')
-screen = pygame.display.set_mode([600,500])
-screen.fill([255,255,255])
+DISPLAYSURF.fill([255,255,255])
 #pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
 background = pygame.Surface([600,500])
 background.fill([0,0,255])
-screen.blit(background,(0,0))
+DISPLAYSURF.blit(background,(0,0))
 
 for bg in bg_Group.sprites():
-    screen.blit(bg.image,bg.rect)
+    DISPLAYSURF.blit(bg.image,bg.rect)
 '''my_font = pygame.font.SysFont(None, 22)
 text = 'helloworld'#u'伏羲'
 text_suf = my_font.render(text,True,(0,0,255))
@@ -384,20 +384,21 @@ screen.blit(text_suf,(200,200))'''
 
 pygame.display.flip()
 pygame.display.update()
+rank = 2
 while True:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             pygame.quit()
             sys.exit()
-
         elif event.type==pygame.MOUSEBUTTONDOWN:
             print event.pos
             clickxy = event.pos
         elif event.type==pygame.MOUSEBUTTONUP:
             if clickxy[0]<100 and clickxy[1]<100 and clickxy[0]>0 and clickxy[1]>0:
-                slide = slide_g(BOARDHEIGHT=2,BOARDWIDTH=2)
-                slide.main()
-                show_help()
+                slide = slide_g(BOARDHEIGHT=rank,BOARDWIDTH=rank)
+                if slide.main():
+                    rank += 1
+                #show_help()
 '''if __name__ == "__main__":
     game1 = match_Game()
     game1.run()
