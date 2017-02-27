@@ -43,7 +43,7 @@ BASICFONT = pygame.font.Font('gkai00mp.ttf', 18)
 
 FPSCLOCK = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption('FuHsi')
+pygame.display.set_caption(u'伏羲')
 
 
 class slide_g(object):
