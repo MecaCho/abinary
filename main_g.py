@@ -5,8 +5,8 @@ import time
 import sys
 import pygame, sys, random
 from pygame.locals import *
-'''reload(sys)
-sys.setdefaultencoding('utf-8')'''
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # Create the constants (go ahead and experiment with different values)
 TILESIZE = 100
@@ -52,10 +52,10 @@ class slide_g(object):
         FPSCLOCK = pygame.time.Clock()
         DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
         pygame.display.set_caption('FuHsi')
-        BASICFONT = pygame.font.Font('Arial.ttf', BASICFONTSIZE)
+        BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
 
         # Store the option buttons and their rectangles in OPTIONS.
-        RESET_SURF, RESET_RECT = self.makeText('中文'.encode('gbk'),    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
+        RESET_SURF, RESET_RECT = self.makeText('set',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
         NEW_SURF,   NEW_RECT   = self.makeText('neagame', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 60)
         SOLVE_SURF, SOLVE_RECT = self.makeText('sloved',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 30)
 
@@ -403,4 +403,6 @@ while True:
     game1.run()
     game2 = link_Game()
     game2.run()'''
+
+
 
