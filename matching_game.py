@@ -15,7 +15,7 @@ WIDTH=130
 HEIGHT=61
 WAITING_TIME=1000
 
-bg_sound = pygame.mixer.Sound("plant.wav")
+
 class Card(pygame.sprite.Sprite):
     "It's the card to see matching game. Has 2 sides, check em"
 
