@@ -8,14 +8,14 @@ class Car(pygame.sprite.Sprite):
         self.rect.bottomright=initial_position
 screen=pygame.display.set_mode([640,480])
 screen.fill([255,255,255])
-fi='1.gif'
+fi='1.png'
 locationgroup=([150,200],[350,360],[250,280])
 Cargroup=pygame.sprite.Group()
 for lo in locationgroup:
     Cargroup.add(Car(fi,lo))
-
-for carlist in Cargroup.sprites():
-    screen.blit(carlist.image,carlist.rect)
+screen.blit(Cargroup.sprites()[0].image,Cargroup.sprites()[0].rect)
+#for carlist in Cargroup.sprites():
+ #   screen.blit(carlist.image,carlist.rect)
 pygame.display.update()
 while True:
     for event in pygame.event.get():

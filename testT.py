@@ -5,8 +5,8 @@ import time
 import sys
 import pygame, sys, random
 from pygame.locals import *
-'''reload(sys)
-sys.setdefaultencoding('utf-8')'''
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # Create the constants (go ahead and experiment with different values)
 TILESIZE = 100
@@ -21,12 +21,13 @@ WHITE =         (255, 255, 255)
 BRIGHTBLUE =    (  0,  50, 255)
 DARKTURQUOISE = (  3,  54,  73)
 GREEN =         (  0, 204,   0)
+BLUE =          (0,0,240)
 
-BGCOLOR = DARKTURQUOISE
+BGCOLOR = BLUE
 TILECOLOR = GREEN
 TEXTCOLOR = WHITE
 BORDERCOLOR = BRIGHTBLUE
-BASICFONTSIZE = 20
+BASICFONTSIZE = 28
 
 BUTTONCOLOR = WHITE
 BUTTONTEXTCOLOR = BLACK
@@ -39,12 +40,33 @@ DOWN = 'down'
 LEFT = 'left'
 RIGHT = 'right'
 pygame.init()
-BASICFONT = pygame.font.Font('gkai00mp.ttf', 18)
+BASICFONT = pygame.font.Font('gkai00mp.ttf', BASICFONTSIZE)
 
 FPSCLOCK = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption(u'伏羲')
 
+DISPLAYSURF.fill([255,255,255])
+#pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
+background = pygame.Surface([600,500])
+background.fill([0,0,255])
+DISPLAYSURF.blit(background,(0,0))
+
+class background(pygame.sprite.Sprite):
+    def __init__(self,filename,inittial_position):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(filename)
+        self.rect  = self.image.get_rect()
+        self.rect.bottomright = inittial_position
+
+tip_location = ([100,64],[210,64],[300,500],[410,500],[200,33],[310,33])
+tip_Group = pygame.sprite.Group()
+tip_Group.add(background('next.png',tip_location[4]))
+tip_Group.add(background('reback.png',tip_location[5]))
+
+
+DISPLAYSURF.blit(tip_Group.sprites()[0].image, tip_Group.sprites()[0].rect)
+DISPLAYSURF.blit(tip_Group.sprites()[1].image, tip_Group.sprites()[1].rect)
 
 class slide_g(object):
     def __init__(self,BOARDHEIGHT=2,BOARDWIDTH=2):
@@ -54,25 +76,53 @@ class slide_g(object):
         self.YMARGIN = int((WINDOWHEIGHT - (TILESIZE * self.bh + (self.bh - 1))) / 2)
 
     def main(self):
-        global FPSCLOCK, DISPLAYSURF, BASICFONT, RESET_SURF, RESET_RECT, NEW_SURF, NEW_RECT, SOLVE_SURF, SOLVE_RECT
+        global FPSCLOCK, DISPLAYSURF, BASICFONT, RESET_SURF, RESET_RECT, NEW_SURF, NEW_RECT, SOLVE_SURF, SOLVE_RECT, next_SURF, next_RECT,exit_SURF, exit_RECT, exit1_SURF, exit1_RECT
 
         # Store the option buttons and their rectangles in OPTIONS.
-        RESET_SURF, RESET_RECT = self.makeText(u'中文',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
-        NEW_SURF,   NEW_RECT   = self.makeText(u'新游戏', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 60)
-        SOLVE_SURF, SOLVE_RECT = self.makeText(u'破解',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 30)
+        RESET_SURF, RESET_RECT = self.makeText(u'设置',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 90)
+        NEW_SURF,   NEW_RECT   = self.makeText(u'新游戏', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 60)
+        SOLVE_SURF, SOLVE_RECT = self.makeText(u'破解',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 30)
+        exit1_SURF, exit1_RECT = self.makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
+        next_SURF, next_RECT = self.makeText(u'继续', TEXTCOLOR, TILECOLOR, 100, 0)
+        exit_SURF, exit_RECT = self.makeText(u'退出', TEXTCOLOR, TILECOLOR, 200, 0)
 
-        mainBoard, solutionSeq = self.generateNewPuzzle(10)
+        mainBoard, solutionSeq = self.generateNewPuzzle(20)
         SOLVEDBOARD = self.getStartingBoard() # a solved board is the same as the board in a start state.
         allMoves = [] # list of moves made from the solved configuration
 
         while True: # main game loop
             slideTo = None # the direction, if any, a tile should slide
             msg = u'点击数字或按下键盘的上下左右键滑动数字' # contains the message to show in the upper left corner.
+            drawp = ''
             if mainBoard == SOLVEDBOARD:
-                return True
-                msg =u'成功!'
+                msg = u'成功!'
+                #print u'成功',self.bw
+                drawp = 'true'
+                if self.bw == 4:
+                    msg = u'恭喜你，通过第二关'
+                    drawp = ''
+                #self.drawBoard(mainBoard, msg)
+                #DISPLAYSURF.blit(tip_Group.sprites()[0].image,tip_Group.sprites()[0].rect)
+                #DISPLAYSURF.blit(tip_Group.sprites()[1].image, tip_Group.sprites()[1].rect)
+                #pygame.display.flip()
+                #pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == MOUSEBUTTONDOWN:
+                        self.clickxy = event.pos
+                    if event.type == MOUSEBUTTONUP:
+                        if self.clickxy[0]<200 and self.clickxy[1]<34 and self.clickxy[0]>100 and self.clickxy[1]>0:
+                            rank = self.bw + 1
+                            newgame = slide_g(BOARDWIDTH=rank,BOARDHEIGHT=rank)
+                            if rank < 5:
+                                newgame.main()
+                            else:
+                                msg = u'恭喜你，通过第二关'
+                        elif self.clickxy[0]<300 and self.clickxy[1]<34 and self.clickxy[0]>200 and self.clickxy[1]>0:
+                            self.terminate()
+                #return True
 
-            self.drawBoard(mainBoard, msg)
+
+            self.drawBoard(mainBoard, msg,drawp)
 
             self.checkForQuit()
             for event in pygame.event.get(): # event handling loop
@@ -90,6 +140,8 @@ class slide_g(object):
                         elif SOLVE_RECT.collidepoint(event.pos):
                             self.resetAnimation(mainBoard, solutionSeq + allMoves) # clicked on Solve button
                             allMoves = []
+                        elif exit1_RECT.collidepoint(event.pos):
+                            self.terminate()
                     else:
                         # check if the clicked tile was next to the blank spot
 
@@ -115,7 +167,7 @@ class slide_g(object):
                         slideTo = DOWN
 
             if slideTo:
-                self.slideAnimation(mainBoard, slideTo, 'Click tile or press arrow keys to slide.', 8) # show slide on screen
+                self.slideAnimation(mainBoard, slideTo, u'点击数字或按上下左右键移动数字', 8) # show slide on screen
                 self.makeMove(mainBoard, slideTo)
                 allMoves.append(slideTo) # record the slide
             pygame.display.update()
@@ -135,22 +187,30 @@ class slide_g(object):
                 self.terminate() # terminate if the KEYUP event was for the Esc key
             pygame.event.post(event) # put the other KEYUP event objects back
 
-
+    def format_bin(self,number_, bw):
+        bin_num = bin(number_).replace('0b', '')
+        if len(bin_num) != bw:
+            bin_num = (bw - len(bin_num)) * '0' + bin_num
+        return bin_num
     def getStartingBoard(self):
         # Return a board data structure with tiles in the solved state.
         # For example, if BOARDWIDTH and BOARDHEIGHT are both 3, this function
         # returns [[1, 4, 7], [2, 5, 8], [3, 6, BLANK]]
         counter = 1
         board = []
+        counter1 = self.format_bin(counter,self.bw)
         for x in range(self.bw):
             column = []
             for y in range(self.bh):
-                column.append(counter)
+                column.append(counter1)
                 counter += self.bw
+                counter1 = self.format_bin(counter, self.bw)
             board.append(column)
             counter -= self.bw * (self.bh - 1) + self.bw - 1
+            counter1 = self.format_bin(counter, self.bw)
 
         board[self.bw-1][self.bh-1] = BLANK
+        print board
         return board
 
 
@@ -238,11 +298,12 @@ class slide_g(object):
         return (textSurf, textRect)
 
 
-    def drawBoard(self,board, message):
+    def drawBoard(self,board, message,drawp=''):
         DISPLAYSURF.fill(BGCOLOR)
         if message:
             textSurf, textRect = self.makeText(message, MESSAGECOLOR, BGCOLOR, 5, 5)
             DISPLAYSURF.blit(textSurf, textRect)
+
 
         for tilex in range(len(board)):
             for tiley in range(len(board[0])):
@@ -257,6 +318,10 @@ class slide_g(object):
         DISPLAYSURF.blit(RESET_SURF, RESET_RECT)
         DISPLAYSURF.blit(NEW_SURF, NEW_RECT)
         DISPLAYSURF.blit(SOLVE_SURF, SOLVE_RECT)
+        DISPLAYSURF.blit(exit1_SURF, exit1_RECT)
+        if drawp:
+            DISPLAYSURF.blit(next_SURF, next_RECT)
+            DISPLAYSURF.blit(exit_SURF, exit_RECT)
 
 
     def slideAnimation(self,board, direction, message, animationSpeed):
@@ -337,13 +402,6 @@ class slide_g(object):
 
 
 
-class background(pygame.sprite.Sprite):
-    def __init__(self,filename,inittial_position):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(filename)
-        self.rect  = self.image.get_rect()
-        self.rect.bottomright = inittial_position
-
 
 def startFlash():
     start_location = [0,0]
@@ -362,18 +420,16 @@ def show_help(filename='1.png',imagelocation=[100,100]):
     rect.bottomright = imagelocation
     screen.blit(imagep,rect)
 
-bg_location = ([100,64],[210,64],[300,500],[410,500])
+bg_location = ([100,64],[210,64],[300,500],[410,500],[100,34],[200,34])
 bg_Group = pygame.sprite.Group()
 bg_Group.add(background('help.png',bg_location[0]))
 bg_Group.add(background('know.png',bg_location[1]))
 bg_Group.add(background('newgame.png',bg_location[2]))
 bg_Group.add(background('exit.png',bg_location[3]))
+#bg_Group.add(background('next.png',bg_location[4]))
+#bg_Group.add(background('reback.png',bg_location[5]))
 
-DISPLAYSURF.fill([255,255,255])
-#pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
-background = pygame.Surface([600,500])
-background.fill([0,0,255])
-DISPLAYSURF.blit(background,(0,0))
+
 
 for bg in bg_Group.sprites():
     DISPLAYSURF.blit(bg.image,bg.rect)
@@ -396,8 +452,8 @@ while True:
         elif event.type==pygame.MOUSEBUTTONUP:
             if clickxy[0]<100 and clickxy[1]<100 and clickxy[0]>0 and clickxy[1]>0:
                 slide = slide_g(BOARDHEIGHT=rank,BOARDWIDTH=rank)
-                if slide.main():
-                    rank += 1
+                slide.main()
+                    #rank += 1
                 #show_help()
 '''if __name__ == "__main__":
     game1 = match_Game()
