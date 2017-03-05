@@ -14,6 +14,8 @@ FPS=60
 WIDTH=130
 HEIGHT=61
 WAITING_TIME=1000
+
+bg_sound = pygame.mixer.Sound("plant.wav")
 class Card(pygame.sprite.Sprite):
     "It's the card to see matching game. Has 2 sides, check em"
 
@@ -141,8 +143,8 @@ class Game(object):
         #game will only change if event happens
         self.clicked=(-1,-1)
         self.opened_cards=[]
-
         while running:
+
             running = self.handleEvents()
 
         print "QUITTING"

@@ -33,6 +33,9 @@ BUTTONCOLOR = WHITE
 BUTTONTEXTCOLOR = BLACK
 MESSAGECOLOR = WHITE
 
+pygame.mixer.init()
+bg_sound=pygame.mixer.Sound("plant.wav")
+
 
 
 UP = 'up'
@@ -84,7 +87,7 @@ class slide_g(object):
         SOLVE_SURF, SOLVE_RECT = self.makeText(u'破解',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 30)
         exit1_SURF, exit1_RECT = self.makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
         next_SURF, next_RECT = self.makeText(u'继续', TEXTCOLOR, TILECOLOR, 100, 0)
-        exit_SURF, exit_RECT = self.makeText(u'退出', TEXTCOLOR, TILECOLOR, 200, 0)
+        exit_SURF, exit_RECT = self.makeText(u'返回', TEXTCOLOR, TILECOLOR, 200, 0)
 
         mainBoard, solutionSeq = self.generateNewPuzzle(20)
         SOLVEDBOARD = self.getStartingBoard() # a solved board is the same as the board in a start state.
@@ -118,7 +121,7 @@ class slide_g(object):
                             else:
                                 msg = u'恭喜你，通过第二关'
                         elif self.clickxy[0]<300 and self.clickxy[1]<34 and self.clickxy[0]>200 and self.clickxy[1]>0:
-                            self.terminate()
+                            return
                 #return True
 
 
@@ -141,7 +144,9 @@ class slide_g(object):
                             self.resetAnimation(mainBoard, solutionSeq + allMoves) # clicked on Solve button
                             allMoves = []
                         elif exit1_RECT.collidepoint(event.pos):
-                            self.terminate()
+                            return
+                        elif exit_RECT.collidepoint(event.pos):
+                            return
                     else:
                         # check if the clicked tile was next to the blank spot
 
@@ -404,14 +409,25 @@ class slide_g(object):
 
 
 def startFlash():
-    start_location = [0,0]
+    start0 = pygame.image.load("start0.jpeg").convert_alpha()
+    start1 = pygame.image.load("start1.png").convert_alpha()
+    '''start_location = [100,100]
     stbg_Group = pygame.sprite.Group()
-    stbg_Group.add(background('start1.png', start_location))
-    stbg_Group.add(background('start2.png', start_location))
-    stbg_Group.add(background('start3.png', start_location))
+    stbg_Group.add(background('exit.png', start_location))
+    stbg_Group.add(background('reback.png', start_location))
+    #stbg_Group.add(background('start2.png', start_location))
     for sf in stbg_Group.sprites():
         time.sleep(3)
-        screen.blit(sf.image,sf.rect)
+        DISPLAYSURF.blit(sf.image,sf.rect)'''
+    DISPLAYSURF.blit(start0, (0,0))
+    pygame.display.flip()
+    pygame.display.update()
+    time.sleep(3)
+
+    #DISPLAYSURF.blit(start1, (0, 0))
+    #time.sleep(3)
+    #pygame.display.flip()
+    #pygame.display.update()
 
 def show_help(filename='1.png',imagelocation=[100,100]):
     print 'True'
@@ -420,27 +436,27 @@ def show_help(filename='1.png',imagelocation=[100,100]):
     rect.bottomright = imagelocation
     screen.blit(imagep,rect)
 
-bg_location = ([100,64],[210,64],[300,500],[410,500],[100,34],[200,34])
-bg_Group = pygame.sprite.Group()
-bg_Group.add(background('help.png',bg_location[0]))
-bg_Group.add(background('know.png',bg_location[1]))
-bg_Group.add(background('newgame.png',bg_location[2]))
-bg_Group.add(background('exit.png',bg_location[3]))
-#bg_Group.add(background('next.png',bg_location[4]))
-#bg_Group.add(background('reback.png',bg_location[5]))
+def start_board():
+    bg_location = ([600,34],[600,69],[100,34],[600,500],[100,34],[200,34])
+    bg_Group = pygame.sprite.Group()
+    bg_Group.add(background('help.png',bg_location[0]))
+    bg_Group.add(background('know.png',bg_location[1]))
+    bg_Group.add(background('newgame.png',bg_location[2]))
+    bg_Group.add(background('exit.png',bg_location[3]))
+    #bg_Group.add(background('next.png',bg_location[4]))
+    #bg_Group.add(background('reback.png',bg_location[5]))
 
 
 
-for bg in bg_Group.sprites():
-    DISPLAYSURF.blit(bg.image,bg.rect)
-'''my_font = pygame.font.SysFont(None, 22)
-text = 'helloworld'#u'伏羲'
-text_suf = my_font.render(text,True,(0,0,255))
-screen.blit(text_suf,(200,200))'''
+    for bg in bg_Group.sprites():
+        DISPLAYSURF.blit(bg.image,bg.rect)
 
-pygame.display.flip()
-pygame.display.update()
+    pygame.display.flip()
+    pygame.display.update()
+startFlash()
+start_board()
 rank = 2
+bg_sound.play(loops=3)
 while True:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
@@ -453,6 +469,7 @@ while True:
             if clickxy[0]<100 and clickxy[1]<100 and clickxy[0]>0 and clickxy[1]>0:
                 slide = slide_g(BOARDHEIGHT=rank,BOARDWIDTH=rank)
                 slide.main()
+                start_board()
                     #rank += 1
                 #show_help()
 '''if __name__ == "__main__":
