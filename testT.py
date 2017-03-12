@@ -10,8 +10,8 @@ sys.setdefaultencoding('utf-8')
 
 # Create the constants (go ahead and experiment with different values)
 TILESIZE = 100
-WINDOWWIDTH = 600
-WINDOWHEIGHT = 500
+WINDOWWIDTH = 800
+WINDOWHEIGHT = 600
 FPS = 30
 BLANK = None
 
@@ -22,6 +22,11 @@ BRIGHTBLUE =    (  0,  50, 255)
 DARKTURQUOISE = (  3,  54,  73)
 GREEN =         (  0, 204,   0)
 BLUE =          (0,0,240)
+
+SCREEN_SIZE = [WINDOWWIDTH,WINDOWHEIGHT]
+WIDTH = 100
+HEIGHT = 100
+WAITING_TIME = 1000
 
 BGCOLOR = BLUE
 TILECOLOR = GREEN
@@ -49,7 +54,7 @@ FPSCLOCK = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption(u'伏羲')
 
-DISPLAYSURF.fill([255,255,255])
+DISPLAYSURF.fill(WHITE)
 #pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
 background = pygame.Surface([600,500])
 background.fill([0,0,255])
@@ -72,12 +77,6 @@ DISPLAYSURF.blit(tip_Group.sprites()[0].image, tip_Group.sprites()[0].rect)
 DISPLAYSURF.blit(tip_Group.sprites()[1].image, tip_Group.sprites()[1].rect)
 
 
-SCREEN_SIZE = [WINDOWWIDTH,WINDOWHEIGHT]
-WIDTH = 90
-HEIGHT = 90
-WAITING_TIME = 1000
-
-
 class Card(pygame.sprite.Sprite):
     "It's the card to see matching game. Has 2 sides, check em"
 
@@ -85,7 +84,6 @@ class Card(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(card_pic)
         self.rect = self.image.get_rect()
-
         self.value = value
         self.rect.left, self.rect.top = xy
         self.rect.width, self.rect.height = WIDTH, HEIGHT
@@ -95,75 +93,34 @@ class Card(pygame.sprite.Sprite):
 class match_g(object):
     "game object, where to show game"
 
+    # [2, 5, 0, 1, 4, 2, 6, 6, 5, 7, 0, 3, 3, 7, 4, 1]
     def __init__(self):
         pygame.init()
         self.window = pygame.display.set_mode(SCREEN_SIZE)
         self.clock = pygame.time.Clock()
-
-        self.score = [0, 0]
-        self.combo = 0
-        self.whose_turn = 1
-        ####################窗口标题
-        pygame.display.set_caption("FuHsi")
-
+        pygame.display.set_caption("伏羲")
         self.f = pygame.font.match_font('ComicSans', "Arial")
         self.winning_font = pygame.font.Font(self.f, 18)
-
-        self.f = pygame.font.match_font("Arial", 'ComicSans')
-        self.score_font = pygame.font.Font(self.f, 18)
-
-        self.winning_text1 = self.winning_font.render("COMBO: %s" % self.combo, True, BLACK)
-        self.winning_text2 = self.winning_font.render("Player Turn: %s" % self.whose_turn, True, BLACK)
-        self.score_text1 = self.score_font.render("Player 1: %s" % self.score[0], True, BLACK)
-        self.score_text2 = self.score_font.render("Player 2: %s" % self.score[1], True, BLACK)
-
-        self.score_rect1 = self.score_text1.get_rect()
-        self.score_rect2 = self.score_text2.get_rect()
-        self.winning_rect1 = self.winning_text1.get_rect()
-        self.winning_rect2 = self.winning_text2.get_rect()
-
-        self.score_rect1.centerx = 200
-        self.score_rect1.centery = 15
-
-        self.winning_rect1.centerx = 350
-        self.winning_rect1.centery = 15
-
-        self.winning_rect2.centerx = 450
-        self.winning_rect2.centery = 15
-
-        self.score_rect2.centerx = 600
-        self.score_rect2.centery = 15
-
         pygame.event.set_allowed([QUIT, MOUSEBUTTONDOWN, MOUSEBUTTONUP])
-
         self.corresponding_position_list = []
         self.drawBackground()
-
         self.sprites = pygame.sprite.RenderUpdates()
 
         self.value_list = []
-        for i in range(0, 18, 1):
-            self.value_list.extend((i, i))
-        # print position_list
-        # instead of randomizing the position, just randomize the values while keeping position in order
-
+        for i in range(0, 16, 1):
+            self.value_list.append(i)
         random.shuffle(self.value_list)
-        ###################################################################################
         print self.value_list
         ctr = -1
-        self.card_list = []
 
-        for pos in range(0, 36, 1):
+        self.card_list = []
+        for pos in range(0, 16, 1):
             val = (self.value_list[pos]) + 1
             self.card_list.append(Card(self.corresponding_position_list[pos], "%s.gif" % val, val))
-        ##########################################################################
-        print self.card_list
         for card in self.card_list:
             self.sprites.add(card)
-        # sound
         self.correct_sound = pygame.mixer.Sound("winner_sound.wav")
         self.wrong_sound = pygame.mixer.Sound("loser_sound.wav")
-
         # display! the blank cards!
         self.sprites = pygame.sprite.RenderUpdates()
 
@@ -181,42 +138,29 @@ class match_g(object):
 
     def drawBackground(self):
         self.background = pygame.Surface(SCREEN_SIZE)
-        self.background.fill(GREEN)
-
-        # draw words
-        self.background.blit(self.score_text1, self.score_rect1)
-        self.background.blit(self.score_text2, self.score_rect2)
-        self.background.blit(self.winning_text1, self.winning_rect1)
-        self.background.blit(self.winning_text2, self.winning_rect2)
-
+        self.background.fill(BLUE)
+        self.bagua_image = pygame.image.load('bagua.png')
+        self.background.blit(self.bagua_image, (0, 0))
         # draw the blank cards
         self.blank_card = pygame.Surface((WIDTH, HEIGHT))
-        self.blank_card.fill(WHITE)
-
-        for x in range(5, 788, WIDTH + 1):
-            for y in range(27, 399, HEIGHT + 1):
+        self.blank_card.fill(GREEN)
+        for x in range(200, 600, WIDTH + 1):
+            for y in range(100, 500, HEIGHT + 1):
                 self.corresponding_position_list.append((x, y))
                 self.background.blit(self.blank_card, (x, y))
-
         self.window.blit(self.background, (0, 0))
-
         pygame.display.flip()
 
     def run(self):
         "runs the game"
         print "starting"
-
         running = True
-
         # game will only change if event happens
         self.clicked = (-1, -1)
         self.opened_cards = []
         while running:
             running = self.handleEvents()
-
-        print "QUITTING"
-        pygame.quit()
-        sys.exit()
+        return
 
     def handleEvents(self):
         for event in pygame.event.get():
@@ -227,60 +171,30 @@ class match_g(object):
                 self.clicked = event.pos
                 # store position
             elif event.type == pygame.MOUSEBUTTONUP:
-
                 # check which card is clicked
                 which_card = 0
-                for x in range(5, 788, WIDTH + 1):
-                    for y in range(27, 399, HEIGHT + 1):
+                for x in range(200, 600, WIDTH + 1):
+                    for y in range(100, 500, HEIGHT + 1):
                         if x <= event.pos[0] and event.pos[0] <= x + WIDTH and y <= event.pos[1] and event.pos[
                             1] <= y + HEIGHT:
                             if x <= self.clicked[0] and self.clicked[0] <= x + WIDTH and y <= self.clicked[1] and \
                                             self.clicked[1] <= y + HEIGHT:
                                 if not self.card_list[which_card] in self.sprites:
-                                    print "This CARD", self.card_list[which_card]
-                                    print "is not in", self.opened_cards
-                                    print "ITS NOT HERE"
                                     self.opened_cards.append(self.card_list[which_card])
                                     self.drawCard(which_card)
-
                                     if len(self.opened_cards) == 2:
-                                        print "HI"
-                                        if self.opened_cards[0].value % 9 == self.opened_cards[1].value % 9:
+                                        if self.opened_cards[0].value % 8 == self.opened_cards[1].value % 8:
                                             self.correct_sound.play()
                                             self.opened_cards = []
-                                            self.combo += 1
-                                            self.score[self.whose_turn - 1] += self.combo
-                                            self.winning_text1 = self.winning_font.render("COMBO: %s" % self.combo,
-                                                                                          True, BLACK)
-                                            self.score_text1 = self.score_font.render("Player 1: %s" % self.score[0],
-                                                                                      True, BLACK)
-                                            self.score_text2 = self.score_font.render("Player 2: %s" % self.score[1],
-                                                                                      True, BLACK)
-                                            # add to score,combo
                                             if len(self.sprites) == len(self.card_list):
-                                                # compare scores
-                                                if self.score[0] > self.score[1]:
-                                                    self.winner = "Player 1"
-                                                elif self.score[0] > self.score[1]:
-                                                    self.whose_turn = "Player 2"
-                                                else:
-                                                    self.whose_turn = "Everybody!"
-                                                self.winning_text1 = self.winning_font.render("WINNER:", True, BLACK)
-                                                self.winning_text2 = self.winning_font.render(self.winner, True, BLACK)
+                                                self.winning_text1 = self.winning_font.render("WIN", True, BLACK)
+                                                return False
                                         else:
                                             self.wrong_sound.play()
                                             pygame.time.wait(WAITING_TIME)
                                             self.combo = 0
                                             self.sprites.remove(self.opened_cards)
-
                                             self.opened_cards = []
-                                            self.whose_turn = (self.whose_turn % 2) + 1
-                                            print "ITS", self.whose_turn
-                                            self.winning_text1 = self.winning_font.render("COMBO: %s" % self.combo,
-                                                                                          True, BLACK)
-                                            self.winning_text2 = self.winning_font.render(
-                                                "Player Turn: %s" % self.whose_turn, True, BLACK)
-
                                             # change player turn, flip cards again, remove from update
                                         self.drawBackground()
                                         self.drawCards()
@@ -291,14 +205,7 @@ class match_g(object):
                                 which_card += 1
                         else:
                             which_card += 1
-
                 self.clicked = (-1, -1)
-                # check if position is card
-                # if yes, update
-                # count number of cards opened
-                # if 2, wait 2 seconds then either keep or close
-                # if keep, +to combo and score
-                # if not, next player
         return True
 
 class slide_g(object):
@@ -319,7 +226,7 @@ class slide_g(object):
         next_SURF, next_RECT = self.makeText(u'继续', TEXTCOLOR, TILECOLOR, 100, 0)
         exit_SURF, exit_RECT = self.makeText(u'返回', TEXTCOLOR, TILECOLOR, 200, 0)
 
-        mainBoard, solutionSeq = self.generateNewPuzzle(20)
+        mainBoard, solutionSeq = self.generateNewPuzzle(2)
         SOLVEDBOARD = self.getStartingBoard() # a solved board is the same as the board in a start state.
         allMoves = [] # list of moves made from the solved configuration
 
@@ -674,15 +581,15 @@ def show_help(filename='1.png',imagelocation=[100,100]):
     screen.blit(imagep,rect)
 
 def start_board():
-    bg_location = ([600,34],[600,69],[150,34],[600,500],[100,34],[200,34],[175,68],[150,103],[170,136])
+    bg_location = ([150,34],[175,69],[150,105],[170,140],[WINDOWWIDTH,34],[WINDOWWIDTH,69],[WINDOWWIDTH,WINDOWHEIGHT])
     bg_Group = pygame.sprite.Group()
-    bg_Group.add(background('help.png',bg_location[0]))
-    bg_Group.add(background('know.png',bg_location[1]))
-    bg_Group.add(background('game1.png',bg_location[2]))
-    bg_Group.add(background('exit.png',bg_location[3]))
-    bg_Group.add(background('game2.png', bg_location[6]))
-    bg_Group.add(background('game3.png', bg_location[7]))
-    bg_Group.add(background('game4.png', bg_location[8]))
+    bg_Group.add(background('help.png',bg_location[4]))
+    bg_Group.add(background('know.png',bg_location[5]))
+    bg_Group.add(background('exit.png',bg_location[6]))
+    bg_Group.add(background('game1.png', bg_location[0]))
+    bg_Group.add(background('game2.png', bg_location[1]))
+    bg_Group.add(background('game3.png', bg_location[2]))
+    bg_Group.add(background('game4.png', bg_location[3]))
     #bg_Group.add(background('next.png',bg_location[4]))
     #bg_Group.add(background('reback.png',bg_location[5]))
 
@@ -712,8 +619,8 @@ while True:
                 startFlash()
                 start_board()
             elif clickxy[0] < 100 and clickxy[1] < 68 and clickxy[0] > 0 and clickxy[1] > 34:
-                slide = slide_g(BOARDHEIGHT=rank, BOARDWIDTH=rank)
-                slide.main()
+                matchg = match_g()
+                matchg.run()
                 startFlash()
                 start_board()
             elif clickxy[0] < 100 and clickxy[1] < 102 and clickxy[0] > 0 and clickxy[1] > 68:
