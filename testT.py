@@ -41,8 +41,9 @@ MESSAGECOLOR = WHITE
 XMARGIN = 0
 YMARGIN = 0
 
+
 pygame.mixer.init()
-bg_sound=pygame.mixer.Sound("plant.wav")
+bg_sound = pygame.mixer.Sound("plant.wav")
 click_sound = pygame.mixer.Sound('click.wav')
 
 UP = 'up'
@@ -62,6 +63,10 @@ background = pygame.Surface([600,500])
 background.fill([0,0,255])
 DISPLAYSURF.blit(background,(0,0))
 
+def bgSoundPlay():
+    pygame.mixer.init()
+    bg_sound = pygame.mixer.Sound("plant.wav")
+    bg_sound.play(loops=3)
 
 def makeText(text, color, bgcolor, top, left):
     # create the Surface and Rect objects for some text.
@@ -71,10 +76,11 @@ def makeText(text, color, bgcolor, top, left):
     return (textSurf, textRect)
 
 # Store the option buttons and their rectangles in OPTIONS.
+exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
+help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
 RESET_SURF, RESET_RECT = makeText(u'设置', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 90)
 NEW_SURF, NEW_RECT = makeText(u'新游戏', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 60)
 SOLVE_SURF, SOLVE_RECT = makeText(u'破解', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 30)
-exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
 next_SURF, next_RECT = makeText(u'继续', TEXTCOLOR, TILECOLOR, 100, 0)
 exit_SURF, exit_RECT = makeText(u'返回', TEXTCOLOR, TILECOLOR, 200, 0)
 
@@ -113,7 +119,6 @@ DISPLAYSURF.blit(tip_Group.sprites()[1].image, tip_Group.sprites()[1].rect)
 
 class Card(pygame.sprite.Sprite):
     "It's the card to see matching game. Has 2 sides, check em"
-
     def __init__(self, xy, card_pic, value):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(card_pic)
@@ -159,6 +164,8 @@ class match_g(object):
         if drawp:
             self.mbackground.blit(next_SURF, next_RECT)
             self.mbackground.blit(exit_SURF, exit_RECT)
+        DISPLAYSURF.blit(self.mbackground, (0, 0))
+        pygame.display.flip()
 
     def drawCard(self, position):
         "position is from 0 to 35, V then by >"
@@ -185,25 +192,26 @@ class match_g(object):
                 self.corresponding_position_list.append((x, y))
                 self.mbackground.blit(self.blank_card, (x, y))
 
-        self.mbackground.blit(RESET_SURF, RESET_RECT)
-        self.mbackground.blit(NEW_SURF, NEW_RECT)
+        self.mbackground.blit(help_SURF, help_RECT)
         self.mbackground.blit(SOLVE_SURF, SOLVE_RECT)
-        self.mbackground.blit(exit1_SURF, exit1_RECT)
         DISPLAYSURF.blit(self.mbackground, (0, 0))
         pygame.display.flip()
 
     def run(self):
-        "runs the game"
+        global msg
         print "starting"
+        msg = u'点击两个方块，若找到两个匹配的则翻开，直到翻开全部方块'  # contains the message to show in the upper left corner.
+        drawp = ''
         running = True
         # game will only change if event happens
         self.clicked = (-1, -1)
         self.opened_cards = []
+       # bgSoundPlay()
+        self.drawtips(msg, drawp)
         while running:
-            msg = u'点击数字或按下键盘的上下左右键滑动数字' # contains the message to show in the upper left corner.
-            drawp = ''
+            self.drawtips(msg, drawp)
             running = self.handleEvents()
-            self.drawtips(msg,drawp)
+
         return
 
     def handleEvents(self):
@@ -218,12 +226,14 @@ class match_g(object):
             elif event.type == pygame.MOUSEBUTTONUP:
                 # check which card is clicked
                 which_card = 0
+                if help_RECT.collidepoint(event.pos):
+                    msg='help info'
+                elif SOLVE_RECT.collidepoint(event.pos):
+                    msg = 'solve info'
                 for x in range(200, 600, WIDTH + 1):
                     for y in range(100, 500, HEIGHT + 1):
-                        if x <= event.pos[0] and event.pos[0] <= x + WIDTH and y <= event.pos[1] and event.pos[
-                            1] <= y + HEIGHT:
-                            if x <= self.clicked[0] and self.clicked[0] <= x + WIDTH and y <= self.clicked[1] and \
-                                            self.clicked[1] <= y + HEIGHT:
+                        if x <= event.pos[0] and event.pos[0] <= x + WIDTH and y <= event.pos[1] and event.pos[1] <= y + HEIGHT:
+                            if x <= self.clicked[0] and self.clicked[0] <= x + WIDTH and y <= self.clicked[1] and self.clicked[1] <= y + HEIGHT:
                                 if not self.card_list[which_card] in self.sprites:
                                     self.opened_cards.append(self.card_list[which_card])
                                     self.drawCard(which_card)
@@ -240,17 +250,17 @@ class match_g(object):
                                             self.combo = 0
                                             self.sprites.remove(self.opened_cards)
                                             self.opened_cards = []
-                                            # change player turn, flip cards again, remove from update
                                         self.drawBackground()
                                         self.drawCards()
                                 else:
                                     print "HI, something bad is happenind"
-
                             else:
                                 which_card += 1
                         else:
                             which_card += 1
                 self.clicked = (-1, -1)
+
+
         return True
 
 class slide_g(object):
@@ -382,11 +392,9 @@ class slide_g(object):
             board.append(column)
             counter -= self.bw * (self.bh - 1) + self.bw - 1
             counter1 = self.format_bin(counter, self.bw)
-
         board[self.bw-1][self.bh-1] = BLANK
         print board
         return board
-
 
     def getBlankPosition(self,board):
         # Return the x and y of board coordinates of the blank space.
@@ -395,11 +403,9 @@ class slide_g(object):
                 if board[x][y] == BLANK:
                     return (x, y)
 
-
     def makeMove(self,board, move):
         # This function does not check if the move is valid.
         blankx, blanky = self.getBlankPosition(board)
-
         if move == UP:
             board[blankx][blanky], board[blankx][blanky + 1] = board[blankx][blanky + 1], board[blankx][blanky]
         elif move == DOWN:
@@ -409,7 +415,6 @@ class slide_g(object):
         elif move == RIGHT:
             board[blankx][blanky], board[blankx - 1][blanky] = board[blankx - 1][blanky], board[blankx][blanky]
 
-
     def isValidMove(self,board, move):
         blankx, blanky = self.getBlankPosition(board)
         return (move == UP and blanky != len(board[0]) - 1) or \
@@ -417,11 +422,9 @@ class slide_g(object):
                (move == LEFT and blankx != len(board) - 1) or \
                (move == RIGHT and blankx != 0)
 
-
     def getRandomMove(self,board, lastMove=None):
         # start with a full list of all four moves
         validMoves = [UP, DOWN, LEFT, RIGHT]
-
         # remove moves from the list as they are disqualified
         if lastMove == UP or not self.isValidMove(board, DOWN):
             validMoves.remove(DOWN)
@@ -435,12 +438,10 @@ class slide_g(object):
         # return a random move from the list of remaining moves
         return random.choice(validMoves)
 
-
     def getLeftTopOfTile(self,tileX, tileY):
         left = self.XMARGIN + (tileX * TILESIZE) + (tileX - 1)
         top = self.YMARGIN + (tileY * TILESIZE) + (tileY - 1)
         return (left, top)
-
 
     def getSpotClicked(self,board, x, y):
         # from the x & y pixel coordinates, get the x & y board coordinates
@@ -554,12 +555,10 @@ class slide_g(object):
             lastMove = move
         return (board, sequence)
 
-
     def resetAnimation(self,board, allMoves):
         # make all of the moves in allMoves in reverse.
         revAllMoves = allMoves[:] # gets a copy of the list
         revAllMoves.reverse()
-
         for move in revAllMoves:
             if move == UP:
                 oppositeMove = DOWN
@@ -613,14 +612,13 @@ def start_board():
 startFlash()
 start_board()
 rank = 2
-bg_sound.play(loops=3)
+#bgSoundPlay()
 while True:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             pygame.quit()
             sys.exit()
         elif event.type==pygame.MOUSEBUTTONDOWN:
-            click_sound.play(loops=1)
             print event.pos
             clickxy = event.pos
         elif event.type==pygame.MOUSEBUTTONUP:
@@ -630,16 +628,19 @@ while True:
                 startFlash()
                 start_board()
             elif clickxy[0] < 100 and clickxy[1] < 68 and clickxy[0] > 0 and clickxy[1] > 34:
+                bg_sound.stop()
                 matchg = match_g()
                 matchg.run()
                 startFlash()
                 start_board()
             elif clickxy[0] < 100 and clickxy[1] < 102 and clickxy[0] > 0 and clickxy[1] > 68:
+                bg_sound.stop()
                 slide = slide_g(BOARDHEIGHT=rank, BOARDWIDTH=rank)
                 slide.main()
                 startFlash()
                 start_board()
             elif clickxy[0] < 100 and clickxy[1] < 136 and clickxy[0] > 0 and clickxy[1] > 102:
+                bg_sound.stop()
                 slide = slide_g(BOARDHEIGHT=rank, BOARDWIDTH=rank)
                 slide.main()
                 startFlash()
