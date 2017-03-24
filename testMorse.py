@@ -3,6 +3,7 @@ import pygame
 import random
 import time
 import sys
+import string
 import pygame, sys, random
 from pygame.locals import *
 reload(sys)
@@ -54,7 +55,8 @@ LEFT = 'left'
 RIGHT = 'right'
 pygame.init()
 BASICFONT = pygame.font.Font('gkai00mp.ttf', BASICFONTSIZE)
-msg_font = pygame.font.Font('gkai00mp.ttf', 28)
+msg_font = pygame.font.Font('gkai00mp.ttf', 29)
+output_font = pygame.font.Font('Arial.ttf', 19)
 
 FPSCLOCK = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -92,8 +94,11 @@ def drawboard(msg = 'help cards',input_='',output_= ''):
         message_SURF,message_RECT = makeText(msg,MESSAGECOLOR, BGCOLOR, 5, 5,font_=msg_font)
         DISPLAYSURF.blit(message_SURF,message_RECT)
     if input_:
-        input_SURF,input_RECT = makeText(input_,MESSAGECOLOR, BGCOLOR, 90, 90,font_=msg_font)
-        DISPLAYSURF.blit(message_SURF,message_RECT)
+        input_SURF,input_RECT = makeText(input_,MESSAGECOLOR, BGCOLOR, 200, WINDOWHEIGHT - 390,font_=msg_font)
+        DISPLAYSURF.blit(input_SURF,input_RECT)
+    if output_:
+        output_SURF,output_RECT = makeText(output_,MESSAGECOLOR, BGCOLOR, 200, WINDOWHEIGHT - 330,font_=output_font)
+        DISPLAYSURF.blit(output_SURF,output_RECT)
     exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
     help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
 
@@ -101,8 +106,8 @@ def drawboard(msg = 'help cards',input_='',output_= ''):
     play_SURF, play_RECT = makeText(u'播放', TEXTCOLOR, TILECOLOR, 400, WINDOWHEIGHT - 200)
     pause_SURF, pause_RECT = makeText(u'暂停', TEXTCOLOR, TILECOLOR, 600, WINDOWHEIGHT - 200)
 
-    input_SURF, input_RECT = makeText(u'输入:'+input_, TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 400)
-    output_SURF, output_RECT = makeText(u'输出:'+output_, TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 350)
+    input_SURF, input_RECT = makeText(u'输入:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 400)
+    output_SURF, output_RECT = makeText(u'输出:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 350)
 
     DISPLAYSURF.blit(translate_SURF, translate_RECT)
     DISPLAYSURF.blit(play_SURF, play_RECT)
@@ -125,6 +130,43 @@ def drawTile(tilex, tiley, number, adjx=0, adjy=0):
     textRect = textSurf.get_rect()
     textRect.center = left + int(TILESIZE / 2) + adjx, top + int(TILESIZE / 2) + adjy
     DISPLAYSURF.blit(textSurf, textRect)
+def translateChars(inputChar = ''):
+    codeDic = [".-", "-...", "-.-.", "-..", ".", "..-.",
+       "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.",
+       "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-",
+       ".--", "-..-", "-.--", "--.."]
+    outputChar = ''
+    for ch in inputChar:
+        ch = string.upper(ch)
+        outputChar += codeDic[ord(ch)-ord('A')]
+        outputChar += '/'
+    return outputChar
+def searchMs(ch=''):
+    codeDic = [".-", "-...", "-.-.", "-..", ".", "..-.",
+       "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.",
+       "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-",
+       ".--", "-..-", "-.--", "--.."]
+    for i in xrange(26):
+        if ch == codeDic[i]:
+            return chr(i+65)
+    return 0
+def translateMorse(inputMorse = ''):
+
+    outputChar = ''
+    tmp = ''
+    letters = ''
+    for ch in inputMorse:
+        tmp += ch
+        if ch==' ' or '/':
+            le = searchMs(tmp)
+            if le:
+                letters += searchMs(tmp)
+            else:
+                return u'输入有误'
+            tmp = ''
+    outputChar += letters
+    return outputChar
+
 
 def morseplay(str_input=''):
     for str in str_input:
@@ -157,14 +199,19 @@ while running:
             clicked = event.pos
         elif event.type == pygame.MOUSEBUTTONUP:
             if translate_RECT.collidepoint(event.pos):
-                output_txt = 'output'
-            di_sound.play(loops=1)
-            time.sleep(0.5)
-            da_sound.play(loops=1)
-            time.sleep(1)
-            morseplay('-.-/.-.')
-            print clicked
-            print output_txt
+                if input_txt:
+                    output_txt = translateChars(input_txt)
+                elif output_txt:
+                    input_txt = translateMorse(output_txt)
+            elif play_RECT.collidepoint(event.pos):
+                di_sound.play(loops=1)
+                time.sleep(0.5)
+                da_sound.play(loops=1)
+                time.sleep(1)
+                output_txt = translateChars(input_txt)
+                morseplay(output_txt)
+                print clicked
+                print output_txt
         elif event.type == KEYUP:
             # check if the user pressed a key to slide a tile
             if event.key in ( K_a,K_b,K_c,K_d,K_e,K_f,K_g,K_h,K_i,K_j,K_k,K_l,K_m,K_n,K_o,K_p,K_q,K_r,K_s,K_t,K_u,K_v,K_w,K_x,K_y,K_z):
@@ -172,6 +219,12 @@ while running:
                 print event.key,key_value
                 input_txt = str(input_txt)+str(key_value)
                 print input_txt
+            elif event.key in (K_MINUS,K_PERIOD):
+                key_value = chr(event.key)
+                print event.key,key_value
+                output_txt = str(output_txt)+str(key_value)
+                print output_txt
+                print event.key
 
 
 
