@@ -97,7 +97,7 @@ def drawboard(msg = 'help cards',input_='',output_= ''):
         input_SURF,input_RECT = makeText(input_,MESSAGECOLOR, BGCOLOR, 200, WINDOWHEIGHT - 390,font_=msg_font)
         DISPLAYSURF.blit(input_SURF,input_RECT)
     if output_:
-        output_SURF,output_RECT = makeText(output_,MESSAGECOLOR, BGCOLOR, 200, WINDOWHEIGHT - 330,font_=output_font)
+        output_SURF,output_RECT = makeText(output_,MESSAGECOLOR, BGCOLOR, 200, WINDOWHEIGHT - 334,font_=output_font)
         DISPLAYSURF.blit(output_SURF,output_RECT)
     exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
     help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
@@ -219,11 +219,13 @@ while running:
                 print event.key,key_value
                 input_txt = str(input_txt)+str(key_value)
                 print input_txt
-            elif event.key in (K_MINUS,K_PERIOD):
+            elif event.key in (K_MINUS,K_PERIOD,K_SPACE,K_SLASH):
                 key_value = chr(event.key)
                 print event.key,key_value
                 output_txt = str(output_txt)+str(key_value)
                 print output_txt
+                print event.key
+            else:
                 print event.key
 
 
