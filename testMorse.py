@@ -62,12 +62,6 @@ FPSCLOCK = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption(u'伏羲')
 
-DISPLAYSURF.fill(WHITE)
-#pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
-background = pygame.Surface([800,600])
-background.fill([0,0,255])
-DISPLAYSURF.blit(background,(0,0))
-pygame.display.update()
 
 def bgSoundPlay():
     pygame.mixer.init()
@@ -81,12 +75,22 @@ def makeText(text, color, bgcolor, top, left,font_=BASICFONT):
     textRect.topleft = (top, left)
     return (textSurf, textRect)
 
-exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
-help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
+def drawbackground():
+    global translate_SURF, translate_RECT,play_SURF, play_RECT,pause_SURF, pause_RECT,reset_SURF, reset_RECT,exit1_SURF, exit1_RECT,help_SURF, help_RECT
+    DISPLAYSURF.fill(WHITE)
+    #pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
+    background = pygame.Surface([800,600])
+    background.fill(BGCOLOR)
+    DISPLAYSURF.blit(background,(0,0))
+    pygame.display.update()
+    exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
+    help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
 
-translate_SURF, translate_RECT = makeText(u'翻译', TEXTCOLOR, TILECOLOR, 200, WINDOWHEIGHT - 200)
-play_SURF, play_RECT = makeText(u'播放', TEXTCOLOR, TILECOLOR, 400, WINDOWHEIGHT - 200)
-pause_SURF, pause_RECT = makeText(u'暂停', TEXTCOLOR, TILECOLOR, 600, WINDOWHEIGHT - 200)
+    translate_SURF, translate_RECT = makeText(u'翻译', TEXTCOLOR, TILECOLOR, 150, WINDOWHEIGHT - 200)
+    play_SURF, play_RECT = makeText(u'播放', TEXTCOLOR, TILECOLOR, 300, WINDOWHEIGHT - 200)
+    pause_SURF, pause_RECT = makeText(u'暂停', TEXTCOLOR, TILECOLOR, 450, WINDOWHEIGHT - 200)
+    reset_SURF, reset_RECT = makeText(u'清空', TEXTCOLOR, TILECOLOR, 600, WINDOWHEIGHT - 200)
+drawbackground()
 
 def drawboard(msg = 'help cards',input_='',output_= ''):
     global translate_SURF, translate_RECT
@@ -102,9 +106,10 @@ def drawboard(msg = 'help cards',input_='',output_= ''):
     exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
     help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
 
-    translate_SURF, translate_RECT = makeText(u'翻译', TEXTCOLOR, TILECOLOR, 200, WINDOWHEIGHT - 200)
-    play_SURF, play_RECT = makeText(u'播放', TEXTCOLOR, TILECOLOR, 400, WINDOWHEIGHT - 200)
-    pause_SURF, pause_RECT = makeText(u'暂停', TEXTCOLOR, TILECOLOR, 600, WINDOWHEIGHT - 200)
+    translate_SURF, translate_RECT = makeText(u'翻译', TEXTCOLOR, TILECOLOR, 150, WINDOWHEIGHT - 200)
+    play_SURF, play_RECT = makeText(u'播放', TEXTCOLOR, TILECOLOR, 300, WINDOWHEIGHT - 200)
+    pause_SURF, pause_RECT = makeText(u'暂停', TEXTCOLOR, TILECOLOR, 450, WINDOWHEIGHT - 200)
+    reset_SURF, reset_RECT = makeText(u'清空', TEXTCOLOR, TILECOLOR, 600, WINDOWHEIGHT - 200)
 
     input_SURF, input_RECT = makeText(u'输入:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 400)
     output_SURF, output_RECT = makeText(u'输出:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 350)
@@ -112,6 +117,7 @@ def drawboard(msg = 'help cards',input_='',output_= ''):
     DISPLAYSURF.blit(translate_SURF, translate_RECT)
     DISPLAYSURF.blit(play_SURF, play_RECT)
     DISPLAYSURF.blit(pause_SURF, pause_RECT)
+    DISPLAYSURF.blit(reset_SURF, reset_RECT)
     DISPLAYSURF.blit(input_SURF, input_RECT)
     DISPLAYSURF.blit(output_SURF, output_RECT)
     pygame.display.update()
@@ -130,6 +136,7 @@ def drawTile(tilex, tiley, number, adjx=0, adjy=0):
     textRect = textSurf.get_rect()
     textRect.center = left + int(TILESIZE / 2) + adjx, top + int(TILESIZE / 2) + adjy
     DISPLAYSURF.blit(textSurf, textRect)
+
 def translateChars(inputChar = ''):
     codeDic = [".-", "-...", "-.-.", "-..", ".", "..-.",
        "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.",
@@ -141,6 +148,7 @@ def translateChars(inputChar = ''):
         outputChar += codeDic[ord(ch)-ord('A')]
         outputChar += '/'
     return outputChar
+
 def searchMs(ch=''):
     codeDic = [".-", "-...", "-.-.", "-..", ".", "..-.",
        "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.",
@@ -150,23 +158,33 @@ def searchMs(ch=''):
         if ch == codeDic[i]:
             return chr(i+65)
     return 0
-def translateMorse(inputMorse = ''):
 
+def translateMorse(inputMorse = ''):
     outputChar = ''
     tmp = ''
     letters = ''
-    for ch in inputMorse:
-        tmp += ch
-        if ch==' ' or '/':
+    if inputMorse.find('/') != -1:
+        inputMorse = inputMorse.split('/')
+    elif inputMorse.find(' ') != -1:
+        inputMorse = inputMorse.split(' ')
+    print inputMorse
+    if type(inputMorse) == list:
+        for ch in inputMorse:
+            tmp = ch
+            print tmp
+            tmp = tmp.strip('/ ')
+            print tmp
             le = searchMs(tmp)
+            print 'letter : ',le
             if le:
                 letters += searchMs(tmp)
             else:
                 return u'输入有误'
             tmp = ''
-    outputChar += letters
+        outputChar += letters
+    else:
+        outputChar = searchMs(inputMorse)
     return outputChar
-
 
 def morseplay(str_input=''):
     for str in str_input:
@@ -187,6 +205,8 @@ def morseplay(str_input=''):
 running  = True
 input_txt = ''
 output_txt = ''
+flag = 0
+di_sound.play()
 while running:
     key_value = ''
     msg_text=u'输入数字、字母、标点符号、或摩尔斯密码符号‘-’、‘.’'
@@ -199,21 +219,32 @@ while running:
             clicked = event.pos
         elif event.type == pygame.MOUSEBUTTONUP:
             if translate_RECT.collidepoint(event.pos):
-                if input_txt:
+                if not output_txt:
                     output_txt = translateChars(input_txt)
-                elif output_txt:
+                elif not input_txt:
                     input_txt = translateMorse(output_txt)
-            elif play_RECT.collidepoint(event.pos):
-                di_sound.play(loops=1)
-                time.sleep(0.5)
-                da_sound.play(loops=1)
-                time.sleep(1)
-                output_txt = translateChars(input_txt)
                 morseplay(output_txt)
-                print clicked
+            elif play_RECT.collidepoint(event.pos):
+                print event.pos
                 print output_txt
+                output_txt = translateChars(input_txt)
+                print output_txt
+                morseplay(output_txt)
+                print output_txt
+            elif reset_RECT.collidepoint(event.pos):
+                print output_txt
+                morseplay(output_txt)
+                flag = 1
+                output_txt = ' '*100
+                input_txt = ' '*100
+            elif pause_RECT.collidepoint(event.pos):
+                print output_txt
+                morseplay(output_txt)
         elif event.type == KEYUP:
-            # check if the user pressed a key to slide a tile
+            if flag:
+                input_txt = ''
+                flag = 0
+                output_txt = ''
             if event.key in ( K_a,K_b,K_c,K_d,K_e,K_f,K_g,K_h,K_i,K_j,K_k,K_l,K_m,K_n,K_o,K_p,K_q,K_r,K_s,K_t,K_u,K_v,K_w,K_x,K_y,K_z):
                 key_value = chr(event.key)
                 print event.key,key_value
@@ -227,6 +258,3 @@ while running:
                 print event.key
             else:
                 print event.key
-
-
-
