@@ -7,7 +7,9 @@ import pygame, sys, random
 from pygame.locals import *
 from slideGame import slide_g
 from matchGame import match_g
-import wx
+from morseGame import morseG
+import Tkinter
+from Tkinter import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -164,18 +166,19 @@ def start_board():
     pygame.display.update()
 
 def showHwnd():
-    app = wx.App()  # 创建对象
-    win = wx.Frame(None, title="info", size=(410, 340))  # 创建窗口对象
+    top = Tkinter.Tk()
+    top.title('Python Title')
+    top.geometry('400x300')
+    top.resizable(width=True, height=True)
 
-    wx.Button(win, label="open", pos=(245, 5), size=(80, 25))  # 创建按钮1
-    wx.Button(win, label="save", pos=(325, 5), size=(80, 25))  # 创建按钮2
-    wx.TextCtrl(win, pos=(5, 5), size=(240, 25))                # 创建文本框1
+    aLabel = Tkinter.Label(top, text='This is a Label')
+    aLabel.grid(column=0, row=0)
 
-    # 创建文本框2
-    wx.TextCtrl(win, pos=(5, 35), size=(400, 300), style=wx.TE_MULTILINE | wx.HSCROLL)
+    action = Tkinter.Button(top, text='Click')
+    action.grid(column=1, row=1)
 
-    win.Show()  # 显示
-    app.MainLoop()
+    # Code to add widgets will go here...
+    top.mainloop()
 
 startFlash()
 start_board()
@@ -206,8 +209,10 @@ while True:
                 start_board()
             elif clickxy[0] < 100 and clickxy[1] < 136 and clickxy[0] > 0 and clickxy[1] > 102:
                 bg_sound.stop()
-                slide = slide_g(BOARDHEIGHT=rank, BOARDWIDTH=rank)
-                slide.main()
-                startFlash()
-                start_board()
+                morse_g = morseG()
+                morse_g.main()
+
+
+
+
 

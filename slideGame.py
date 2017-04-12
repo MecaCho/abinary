@@ -55,7 +55,7 @@ BASICFONT = pygame.font.Font('gkai00mp.ttf', BASICFONTSIZE)
 
 FPSCLOCK = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption(u'伏羲')
+pygame.display.set_caption(u'8421')
 
 DISPLAYSURF.fill(WHITE)
 #pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
