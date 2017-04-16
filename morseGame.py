@@ -238,7 +238,7 @@ class morseG(object):
                         input_txt = ' '*100
                     elif pause_RECT.collidepoint(event.pos):
                         print output_txt
-                        self.morseplay(output_txt)
+                        return
                 elif event.type == KEYUP:
                     if flag:
                         input_txt = ''
