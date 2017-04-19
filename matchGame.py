@@ -27,7 +27,7 @@ BLUE =          (0,0,240)
 SCREEN_SIZE = [WINDOWWIDTH,WINDOWHEIGHT]
 WIDTH = 100
 HEIGHT = 100
-WAITING_TIME = 200
+WAITING_TIME = 1000
 
 BGCOLOR = BLUE
 TILECOLOR = GREEN
@@ -77,9 +77,9 @@ def makeText(text, color, bgcolor, top, left):
     return (textSurf, textRect)
 
 # Store the option buttons and their rectangles in OPTIONS.
-help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 90)
-NEW_SURF, NEW_RECT = makeText(u'新游戏', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 60)
-SOLVE_SURF, SOLVE_RECT = makeText(u'破解', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 30)
+help_SURF, help_RECT = makeText(u'知识卡片', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 30)
+return_SURF, return_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 90)
+SOLVE_SURF, SOLVE_RECT = makeText(u'破解', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 60)
 next_SURF, next_RECT = makeText(u'继续', TEXTCOLOR, TILECOLOR, 100, 100)
 exit_SURF, exit_RECT = makeText(u'返回', TEXTCOLOR, TILECOLOR, 200, 100)
 
@@ -172,8 +172,16 @@ class match_g(object):
         pygame.display.flip()
 
     def showHwnd(self):
-        hwnd = Tkinter.Tk()
-        hwnd.mainloop()
+        top = Tkinter.Tk()
+        top.title(u'知识卡片1')
+        top.geometry('620x300')
+        top.resizable(width=True, height=True)
+
+        imgFile= './h1.gif'
+        img = Tkinter.PhotoImage(file=imgFile)
+        label1=Tkinter.Label(top,image=img)
+        label1.grid(column=0, row=0)
+        top.mainloop()
 
     def drawCard(self, position):
         self.sprites.add(self.card_list[position])
@@ -201,7 +209,7 @@ class match_g(object):
                 self.mbackground.blit(self.blank_card, (x, y))
 
         self.mbackground.blit(help_SURF, help_RECT)
-        self.mbackground.blit(NEW_SURF, NEW_RECT)
+        self.mbackground.blit(return_SURF, return_RECT)
         self.mbackground.blit(SOLVE_SURF, SOLVE_RECT)
         DISPLAYSURF.blit(self.mbackground, (0, 0))
         pygame.display.flip()
@@ -238,7 +246,7 @@ class match_g(object):
         global msg,opened_cards,rightCards,dur_time
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return
+                return False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 click_sound.play(loops=1)
                 #print event.pos
@@ -249,7 +257,7 @@ class match_g(object):
                     self.showHwnd()
                 elif SOLVE_RECT.collidepoint(event.pos):
                     msg = 'solve info'
-                elif NEW_RECT.collidepoint(event.pos):
+                elif return_RECT.collidepoint(event.pos):
                     return
                 elif self.searchCard(eventPos=event.pos) != -1:
                     #print self.searchCard(eventPos=event.pos)

@@ -26,7 +26,8 @@ BLACK =         (  0,   0,   0)
 WHITE =         (255, 255, 255)
 BRIGHTBLUE =    (  0,  50, 255)
 DARKTURQUOISE = (  3,  54,  73)
-GREEN =         (  0, 204,   0)
+GREEN =         (  0, 255,   0)
+darkGreen =     (0,100,0)
 BLUE =          (0,0,240)
 
 SCREEN_SIZE = [WINDOWWIDTH,WINDOWHEIGHT]
@@ -35,10 +36,11 @@ HEIGHT = 100
 WAITING_TIME = 1000
 
 BGCOLOR = BLUE
-TILECOLOR = GREEN
+TILECOLOR = darkGreen
 TEXTCOLOR = WHITE
 BORDERCOLOR = BRIGHTBLUE
 BASICFONTSIZE = 28
+titleFontSize = 43
 
 BUTTONCOLOR = WHITE
 BUTTONTEXTCOLOR = BLACK
@@ -58,6 +60,7 @@ LEFT = 'left'
 RIGHT = 'right'
 pygame.init()
 BASICFONT = pygame.font.Font('gkai00mp.ttf', BASICFONTSIZE)
+titleFONT = pygame.font.Font('gkai00mp.ttf', titleFontSize)
 
 FPSCLOCK = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -76,17 +79,21 @@ def bgSoundPlay():
 
 def makeText(text, color, bgcolor, top, left):
     # create the Surface and Rect objects for some text.
-    textSurf = BASICFONT.render(text, True, color, bgcolor)
+    textSurf = titleFONT.render(text, True, color, bgcolor)
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
 
 # Store the option buttons and their rectangles in OPTIONS.
-exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
-help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
-RESET_SURF, RESET_RECT = makeText(u'设置', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 90)
-NEW_SURF, NEW_RECT = makeText(u'新游戏', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 60)
-SOLVE_SURF, SOLVE_RECT = makeText(u'破解', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 30)
+game1_SURF, game1_RECT = makeText(u'伏羲的启示', TEXTCOLOR, TILECOLOR, WINDOWWIDTH*0.1, 20)
+game2_SURF, game2_RECT = makeText(u'神奇的八卦', TEXTCOLOR, TILECOLOR, WINDOWWIDTH*0.1, 80)
+game3_SURF, game3_RECT = makeText(u'8421', TEXTCOLOR, TILECOLOR, WINDOWWIDTH*0.1, 140)
+game4_SURF, game4_RECT = makeText(u'摩尔斯密码', TEXTCOLOR, TILECOLOR, WINDOWWIDTH*0.1, 200)
+exit1_SURF, exit1_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 120)
+help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 120)
+RESET_SURF, RESET_RECT = makeText(u'设置', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 90)
+NEW_SURF, NEW_RECT = makeText(u'新游戏', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 60)
+SOLVE_SURF, SOLVE_RECT = makeText(u'破解', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 30)
 next_SURF, next_RECT = makeText(u'继续', TEXTCOLOR, TILECOLOR, 100, 0)
 exit_SURF, exit_RECT = makeText(u'返回', TEXTCOLOR, TILECOLOR, 200, 0)
 
@@ -145,23 +152,13 @@ def show_help(filename='1.png',imagelocation=[100,100]):
     imagep = pygame.image.load(filename)
     rect = imagep.get_rect()
     rect.bottomright = imagelocation
-    screen.blit(imagep,rect)
+    DISPLAYSURF.blit(imagep,rect)
 
 def start_board():
-    bg_location = ([150,34],[175,69],[150,105],[170,140],[WINDOWWIDTH,34],[WINDOWWIDTH,69],[WINDOWWIDTH,WINDOWHEIGHT])
-    bg_Group = pygame.sprite.Group()
-    bg_Group.add(background('help.png',bg_location[4]))
-    bg_Group.add(background('know.png',bg_location[5]))
-    bg_Group.add(background('exit.png',bg_location[6]))
-    bg_Group.add(background('game1.png', bg_location[0]))
-    bg_Group.add(background('game2.png', bg_location[1]))
-    bg_Group.add(background('game3.png', bg_location[2]))
-    bg_Group.add(background('game4.png', bg_location[3]))
-    #bg_Group.add(background('next.png',bg_location[4]))
-    #bg_Group.add(background('reback.png',bg_location[5]))
-
-    for bg in bg_Group.sprites():
-        DISPLAYSURF.blit(bg.image,bg.rect)
+    DISPLAYSURF.blit(game1_SURF, game1_RECT)
+    DISPLAYSURF.blit(game2_SURF, game2_RECT)
+    DISPLAYSURF.blit(game3_SURF, game3_RECT)
+    DISPLAYSURF.blit(game4_SURF, game4_RECT)
     pygame.display.flip()
     pygame.display.update()
 
@@ -193,21 +190,21 @@ while True:
             print event.pos
             clickxy = event.pos
         elif event.type==pygame.MOUSEBUTTONUP:
-            if clickxy[0]<100 and clickxy[1]<34 and clickxy[0]>0 and clickxy[1]>0:
+            if game1_RECT.collidepoint(event.pos):
                 showHwnd()
-            elif clickxy[0] < 100 and clickxy[1] < 68 and clickxy[0] > 0 and clickxy[1] > 34:
+            elif game2_RECT.collidepoint(event.pos):
                 bg_sound.stop()
                 matchg = match_g()
                 matchg.run()
                 startFlash()
                 start_board()
-            elif clickxy[0] < 100 and clickxy[1] < 102 and clickxy[0] > 0 and clickxy[1] > 68:
+            elif game3_RECT.collidepoint(event.pos):
                 bg_sound.stop()
                 slide = slide_g(BOARDHEIGHT=rank, BOARDWIDTH=rank)
                 slide.main()
                 startFlash()
                 start_board()
-            elif clickxy[0] < 100 and clickxy[1] < 136 and clickxy[0] > 0 and clickxy[1] > 102:
+            elif game4_RECT.collidepoint(event.pos):
                 bg_sound.stop()
                 morse_g = morseG()
                 morse_g.main()

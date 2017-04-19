@@ -5,6 +5,7 @@ import time
 import sys
 import string
 import pygame, sys, random
+import Tkinter
 from pygame.locals import *
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -57,10 +58,39 @@ msg_font = pygame.font.Font('gkai00mp.ttf', 29)
 output_font = pygame.font.Font('Arial.ttf', 19)
 
 FPSCLOCK = pygame.time.Clock()
-DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption(u'摩尔斯密码')
+
+
+
+def makeText(text, color, bgcolor, top, left, font_=BASICFONT):
+    # create the Surface and Rect objects for some text.
+    textSurf = font_.render(text, True, color, bgcolor)
+    textRect = textSurf.get_rect()
+    textRect.topleft = (top, left)
+    return (textSurf, textRect)
+
+input_SURF, input_RECT = makeText(u'输入:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 400)
+output_SURF, output_RECT = makeText(u'输出:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 350)
+
+translate_SURF, translate_RECT = makeText(u'翻译', TEXTCOLOR, TILECOLOR, 150, WINDOWHEIGHT - 200)
+play_SURF, play_RECT = makeText(u'播放', TEXTCOLOR, TILECOLOR, 300, WINDOWHEIGHT - 200)
+reset_SURF, reset_RECT = makeText(u'清空', TEXTCOLOR, TILECOLOR, 450, WINDOWHEIGHT - 200)
+
+return_SURF, return_RECT = makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 100)
+help_SURF, help_RECT = makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 140, WINDOWHEIGHT - 50)
 
 class morseG(object):
+    def __init__(self):
+        self.DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+        pygame.display.set_caption(u'摩尔斯密码')
+
+        self.DISPLAYSURF.fill(WHITE)
+        # pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
+        self.background = pygame.Surface([800, 600])
+        self.background.fill(BGCOLOR)
+        self.DISPLAYSURF.blit(self.background, (0, 0))
+        pygame.display.update()
+
+    global input_SURF, input_RECT, output_SURF, output_RECT, translate_SURF, translate_RECT, play_SURF, play_RECT, pause_SURF, pause_RECT, reset_SURF, reset_RECT, exit1_SURF, exit1_RECT, help_SURF, help_RECT, return_SURF, return_RECT
     def bgSoundPlay(self):
         pygame.mixer.init()
         bg_sound = pygame.mixer.Sound("plant.wav")
@@ -73,51 +103,40 @@ class morseG(object):
         textRect.topleft = (top, left)
         return (textSurf, textRect)
 
-    def drawbackground(self):
-        global translate_SURF, translate_RECT,play_SURF, play_RECT,pause_SURF, pause_RECT,reset_SURF, reset_RECT,exit1_SURF, exit1_RECT,help_SURF, help_RECT
-        DISPLAYSURF.fill(WHITE)
-        #pygame.draw.circle(screen,THECOLORS['blue'],[100,100],30,2)
-        background = pygame.Surface([800,600])
-        background.fill(BGCOLOR)
-        DISPLAYSURF.blit(background,(0,0))
-        pygame.display.update()
-        exit1_SURF, exit1_RECT = self.makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
-        help_SURF, help_RECT = self.makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
+    def showHwnd(self):
+        top = Tkinter.Tk()
+        top.title(u'知识卡片3')
+        top.geometry('500x450')
+        top.resizable(width=True, height=True)
 
-        translate_SURF, translate_RECT = self.makeText(u'翻译', TEXTCOLOR, TILECOLOR, 150, WINDOWHEIGHT - 200)
-        play_SURF, play_RECT = self.makeText(u'播放', TEXTCOLOR, TILECOLOR, 300, WINDOWHEIGHT - 200)
-        pause_SURF, pause_RECT = self.makeText(u'暂停', TEXTCOLOR, TILECOLOR, 450, WINDOWHEIGHT - 200)
-        reset_SURF, reset_RECT = self.makeText(u'清空', TEXTCOLOR, TILECOLOR, 600, WINDOWHEIGHT - 200)
+        imgFile= './h2.gif'
+        img = Tkinter.PhotoImage(file=imgFile)
+        label1=Tkinter.Label(top,image=img)
+        label1.grid(column=0, row=0)
+        top.mainloop()
 
 
     def drawboard(self,msg = 'help cards',input_='',output_= ''):
-        global translate_SURF, translate_RECT
+        global input_SURF, input_RECT, output_SURF, output_RECT, translate_SURF, translate_RECT, play_SURF, play_RECT, pause_SURF, pause_RECT, reset_SURF, reset_RECT, exit1_SURF, exit1_RECT, help_SURF, help_RECT, return_SURF, return_RECT
         if msg:
             message_SURF,message_RECT = self.makeText(msg,MESSAGECOLOR, BGCOLOR, 5, 5,font_=msg_font)
-            DISPLAYSURF.blit(message_SURF,message_RECT)
+            self.DISPLAYSURF.blit(message_SURF,message_RECT)
         if input_:
             input_SURF,input_RECT = self.makeText(input_,MESSAGECOLOR, BGCOLOR, 200, WINDOWHEIGHT - 390,font_=msg_font)
-            DISPLAYSURF.blit(input_SURF,input_RECT)
+            self.DISPLAYSURF.blit(input_SURF,input_RECT)
         if output_:
             output_SURF,output_RECT = self.makeText(output_,MESSAGECOLOR, BGCOLOR, 200, WINDOWHEIGHT - 334,font_=output_font)
-            DISPLAYSURF.blit(output_SURF,output_RECT)
-        exit1_SURF, exit1_RECT = self.makeText(u'退出', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
-        help_SURF, help_RECT = self.makeText(u'帮助', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 90, WINDOWHEIGHT - 120)
+            self.DISPLAYSURF.blit(output_SURF,output_RECT)
 
-        translate_SURF, translate_RECT = self.makeText(u'翻译', TEXTCOLOR, TILECOLOR, 150, WINDOWHEIGHT - 200)
-        play_SURF, play_RECT = self.makeText(u'播放', TEXTCOLOR, TILECOLOR, 300, WINDOWHEIGHT - 200)
-        pause_SURF, pause_RECT = self.makeText(u'暂停', TEXTCOLOR, TILECOLOR, 450, WINDOWHEIGHT - 200)
-        reset_SURF, reset_RECT = self.makeText(u'清空', TEXTCOLOR, TILECOLOR, 600, WINDOWHEIGHT - 200)
+        self.DISPLAYSURF.blit(translate_SURF, translate_RECT)
+        self.DISPLAYSURF.blit(play_SURF, play_RECT)
+        self.DISPLAYSURF.blit(reset_SURF, reset_RECT)
 
-        input_SURF, input_RECT = self.makeText(u'输入:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 400)
-        output_SURF, output_RECT = self.makeText(u'输出:', TEXTCOLOR, TILECOLOR, 100, WINDOWHEIGHT - 350)
+        self.DISPLAYSURF.blit(input_SURF, input_RECT)
+        self.DISPLAYSURF.blit(output_SURF, output_RECT)
 
-        DISPLAYSURF.blit(translate_SURF, translate_RECT)
-        DISPLAYSURF.blit(play_SURF, play_RECT)
-        DISPLAYSURF.blit(pause_SURF, pause_RECT)
-        DISPLAYSURF.blit(reset_SURF, reset_RECT)
-        DISPLAYSURF.blit(input_SURF, input_RECT)
-        DISPLAYSURF.blit(output_SURF, output_RECT)
+        self.DISPLAYSURF.blit(return_SURF, return_RECT)
+        self.DISPLAYSURF.blit(help_SURF, help_RECT)
         pygame.display.update()
 
     def getLeftTopOfTile(self,tileX, tileY):
@@ -129,11 +148,11 @@ class morseG(object):
         # draw a tile at board coordinates tilex and tiley, optionally a few
         # pixels over (determined by adjx and adjy)
         left, top = self.getLeftTopOfTile(tilex, tiley)
-        pygame.draw.rect(DISPLAYSURF, TILECOLOR, (left + adjx, top + adjy, TILESIZE, TILESIZE))
+        pygame.draw.rect(self.DISPLAYSURF, TILECOLOR, (left + adjx, top + adjy, TILESIZE, TILESIZE))
         textSurf = BASICFONT.render(str(number), True, TEXTCOLOR)
         textRect = textSurf.get_rect()
         textRect.center = left + int(TILESIZE / 2) + adjx, top + int(TILESIZE / 2) + adjy
-        DISPLAYSURF.blit(textSurf, textRect)
+        self.DISPLAYSURF.blit(textSurf, textRect)
 
     def translateChars(self,inputChar = ''):
         codeDic = [".-", "-...", "-.-.", "-..", ".", "..-.",
@@ -201,62 +220,66 @@ class morseG(object):
                 print 'sleep'
 
     def main(self):
-        self.drawbackground()
-        running  = True
+        global input_txt,output_txt
         input_txt = ''
         output_txt = ''
-        flag = 0
-        di_sound.play()
+        running  = True
         while running:
-            key_value = ''
-            msg_text=u'输入数字、字母、标点符号、或摩尔斯密码符号‘-’、‘.’'
-            self.drawboard(msg=msg_text,input_=input_txt,output_=output_txt)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    clicked = event.pos
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    if translate_RECT.collidepoint(event.pos):
-                        if not output_txt:
-                            output_txt = self.translateChars(input_txt)
-                        elif not input_txt:
-                            input_txt = self.translateMorse(output_txt)
-                        self.morseplay(output_txt)
-                    elif play_RECT.collidepoint(event.pos):
-                        print event.pos
-                        print output_txt
-                        output_txt = translateChars(input_txt)
-                        print output_txt
-                        self.morseplay(output_txt)
-                        print output_txt
-                    elif reset_RECT.collidepoint(event.pos):
-                        print output_txt
-                        self.morseplay(output_txt)
-                        flag = 1
-                        output_txt = ' '*100
-                        input_txt = ' '*100
-                    elif pause_RECT.collidepoint(event.pos):
-                        print output_txt
-                        return
-                elif event.type == KEYUP:
-                    if flag:
-                        input_txt = ''
-                        flag = 0
-                        output_txt = ''
-                    if event.key in ( K_a,K_b,K_c,K_d,K_e,K_f,K_g,K_h,K_i,K_j,K_k,K_l,K_m,K_n,K_o,K_p,K_q,K_r,K_s,K_t,K_u,K_v,K_w,K_x,K_y,K_z):
-                        key_value = chr(event.key)
-                        print event.key,key_value
-                        input_txt = str(input_txt)+str(key_value)
-                        print input_txt
-                    elif event.key in (K_MINUS,K_PERIOD,K_SPACE,K_SLASH):
-                        key_value = chr(event.key)
-                        print event.key,key_value
-                        output_txt = str(output_txt)+str(key_value)
-                        print output_txt
-                        print event.key
-                    else:
-                        print event.key
+            msg_text = u'输入数字、字母、标点符号、或摩尔斯密码符号‘-’、‘.’'
+            self.drawboard(msg=msg_text, input_=input_txt, output_=output_txt)
+            running = self.handleEvents()
+        return
+
+    def handleEvents(self):
+        global input_txt, output_txt
+        flag = 0
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                clicked = event.pos
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if translate_RECT.collidepoint(clicked):
+                    if not output_txt:
+                        output_txt = self.translateChars(input_txt)
+                    elif not input_txt:
+                        input_txt = self.translateMorse(output_txt)
+                        # self.morseplay(output_txt)
+                elif play_RECT.collidepoint(clicked):
+                    output_txt = self.translateChars(input_txt)
+                    self.morseplay(output_txt)
+                elif reset_RECT.collidepoint(clicked):
+                    # self.morseplay(output_txt)
+                    flag = 1
+                    output_txt = ' ' * 100
+                    input_txt = ' ' * 100
+                elif return_RECT.collidepoint(clicked):
+                    # print output_txt
+                    return False
+                elif help_RECT.collidepoint(clicked):
+                    # print output_txt
+                    self.showHwnd()
+            elif event.type == KEYUP:
+                if flag:
+                    input_txt = ''
+                    flag = 0
+                    output_txt = ''
+                if event.key in (
+                K_a, K_b, K_c, K_d, K_e, K_f, K_g, K_h, K_i, K_j, K_k, K_l, K_m, K_n, K_o, K_p, K_q, K_r,
+                K_s, K_t, K_u, K_v, K_w, K_x, K_y, K_z):
+                    key_value = chr(event.key)
+                    print event.key, key_value
+                    input_txt = str(input_txt) + str(key_value)
+                    print input_txt
+                elif event.key in (K_MINUS, K_PERIOD, K_SPACE, K_SLASH):
+                    key_value = chr(event.key)
+                    print event.key, key_value
+                    output_txt = str(output_txt) + str(key_value)
+                    print output_txt
+                    print event.key
+                else:
+                    print event.key
+        return True
 
 
 if __name__ == '__main__':

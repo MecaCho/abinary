@@ -13,7 +13,7 @@ def showHwnd():
 
     aLabel = Tkinter.Label(top, text='This is a Label')
     aLabel.grid(column=0, row=0)
- 
+
     action = Tkinter.Button(top, text='Click')
     action.grid(column=1, row=1)
 
