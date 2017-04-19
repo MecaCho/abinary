@@ -237,26 +237,26 @@ class morseG(object):
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                clicked = event.pos
+                self.clicked = event.pos
             elif event.type == pygame.MOUSEBUTTONUP:
-                if translate_RECT.collidepoint(clicked):
+                if translate_RECT.collidepoint(self.clicked):
                     if not output_txt:
                         output_txt = self.translateChars(input_txt)
                     elif not input_txt:
                         input_txt = self.translateMorse(output_txt)
                         # self.morseplay(output_txt)
-                elif play_RECT.collidepoint(clicked):
+                elif play_RECT.collidepoint(self.clicked):
                     output_txt = self.translateChars(input_txt)
                     self.morseplay(output_txt)
-                elif reset_RECT.collidepoint(clicked):
+                elif reset_RECT.collidepoint(self.clicked):
                     # self.morseplay(output_txt)
                     flag = 1
                     output_txt = ' ' * 100
                     input_txt = ' ' * 100
-                elif return_RECT.collidepoint(clicked):
+                elif return_RECT.collidepoint(self.clicked):
                     # print output_txt
                     return False
-                elif help_RECT.collidepoint(clicked):
+                elif help_RECT.collidepoint(self.clicked):
                     # print output_txt
                     self.showHwnd()
             elif event.type == KEYUP:

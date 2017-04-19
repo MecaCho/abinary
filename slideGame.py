@@ -424,3 +424,8 @@ class slide_g(object):
                 oppositeMove = RIGHT
             self.slideAnimation(board, oppositeMove, '', animationSpeed=int(TILESIZE / 2))
             self.makeMove(board, oppositeMove)
+
+
+if __name__ == '__main__':
+    testGame = slide_g()
+    testGame.main()
